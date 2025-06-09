@@ -1,55 +1,75 @@
 package Classes;
 import Classes.* ;
-public class Light extends Device {
+import ENUMS.Areas;
+import Interfaces.LightInterface;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+public class Light extends Device implements LightInterface {
     private int brightness = 0;
+    private static final int MAX_BRIGHTNESS = 100;
+    private static final int MIN_BRIGHTNESS = 0;
+
+    // ---------------------------------------------------------
+    public Light(Areas area, int brightnessValue, Hub hub) {
+        super(area, hub);
+        setBrightness(brightnessValue);
+    }
+    // ---------------------------------------------------------
+    public void setBrightness(int brightnessValue) {
+        if (!isOn()) {
+            System.out.println("Cannot set brightness - device is off");
+            return;
+        }
+
+        if (brightnessValue >= MIN_BRIGHTNESS && brightnessValue <= MAX_BRIGHTNESS) {
+            this.brightness = brightnessValue;
+            logOperation("Brightness set to " + brightnessValue + "%");
+        } else {
+            System.out.println("Type a value between " + MIN_BRIGHTNESS + " and " + MAX_BRIGHTNESS);
+        }
+    }
+
+    // ---------------------------------------------------------
+    public int getBrightness() {
+        if (!this.isOn()) {
+            System.out.print("Light is not working, Brightness is ");
+        } else {
+            System.out.print("Light is working, Brightness is ");
+        }
+        return this.isOn() ? this.brightness : 0;
+    }
+    // ---------------------------------------------------------
+
+    @Override
+    public void turnOn() {
+        super.turnOn();
+        logOperation("Light turned on with brightness " + brightness + "%");
+    }
+
+    @Override
+    public void turnOff() {
+        super.turnOff();
+        logOperation("Light turned off");
+    }
+
     @Override
     public String toString() {
-        return isWorking
-                ? "This light device ID = " + this.getId() + " is ON and brightness is " + brightness
-                : "This light device ID = " + this.getId() +" is OFF";
-    }
-
-    public Light(int brightnessValue){
-        setBrightness(brightnessValue);
-        this.centralHub.addDevice(this) ;
-    }
-    public void setBrightness(int brightnessValue) {
-        if (brightnessValue >= 0 && brightnessValue <= 100) {
-            this.brightness = brightnessValue;
-            if (!this.isWorking)
-                this.toggleWorkStats(this);
-        } else {
-            System.out.println("Type a value between 0 and 100");
-        }
-    }
-
-    public void openLight() {
-        this.setBrightness(this.brightness);
-
-        if (!this.isWorking){
-            this.toggleWorkStats(this);
-            System.out.println("openLight");
-        } else {
-            System.out.println("Already open");
-        }
-    }
-
-    public void closeLight() {
-        if (this.isWorking) {
-            this.toggleWorkStats(this);
-            System.out.println("closeLight");
-        } else {
-            System.out.println("it's already off");
-        }
-    }
-
-    public int getBrightness() {
-        return this.brightness;
+        return "Light [Area=" + getArea() +
+                ", ID=" + getId() +
+                ", Status=" + (isOn() ? "ON" : "OFF") +
+                (isOn() ? ", Brightness=" + brightness + "%" : "") +
+                "]";
     }
 
     @Override
-    protected void energySavingMode() {
-        this.setBrightness(this.brightness/2);
+    public void energySavingMode() {
+        if (!this.isOn()){
+        logOperation("Device must be On before activating Energy Saving Mode");
+        }
+        int newBrightness = this.brightness / 2;
+        setBrightness(newBrightness);
     }
+
 
 }
