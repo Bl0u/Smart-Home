@@ -1,9 +1,30 @@
 package Interfaces;
 
 import Classes.Device;
-
+import ENUMS.* ;
 public interface DeviceInterface {
 
-    public void energySavingMode() ;
-    boolean toggleWorkStats(Device deviceType) ;
+    void energySavingMode() ;
+    int getId();
+    void turnOn();
+    void turnOff();
+    boolean isOn();
+    String getStatus();
+    String getArea() ;
+    void setArea(Areas area) ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//    boolean toggleStats(Device deviceType) ;
 }

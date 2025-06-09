@@ -1,28 +1,71 @@
 package Classes;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+import ENUMS.Areas;
 import Interfaces.DeviceInterface;
 import Classes.* ;
-public abstract class Device  {
-    protected boolean isWorking = false; // Better field name
-    public static Hub centralHub = new Hub() ;
+public abstract class Device implements DeviceInterface  {
+    protected boolean isOn = false; // Better field name
+    public Hub centralHub ;
     protected static int nextId = 1; // shared
     protected int id; // instance's id
+    protected String area = "" ;
 
-    public Device() {
+
+
+    // ---------------------------------------------------------
+    public Device(Areas area, Hub hub) {
+        this.turnOn() ;
         this.id = nextId++;
+        setArea(area);
+        setHub(hub);
+        this.centralHub.addDevice(this);
     }
-    protected boolean getIsWorking(){return this.isWorking ;}
 
-    protected int getId() {
+    // -------------------GET--------------------------------------
+    protected boolean getIsWorking(){return this.isOn ;}
+
+    public int getId() {
         return id;
     }
-    protected void energySavingMode(){}
-    // Method to toggle and display device state
-    protected boolean toggleWorkStats(Device deviceType) {
-        deviceType.isWorking = !deviceType.isWorking;
-        String deviceTypeName = deviceType.getClass().getSimpleName(); // return the class name in runtime
-        System.out.println(deviceTypeName + " is currently " + (deviceType.isWorking ? "on" : "off"));
-        return isWorking;
+
+    public String getStatus() {
+        return isOn
+                ? " Working fine"
+                : "Not working" ;
+    }
+    public String getArea(){
+        return this.area ;
+    }
+    // -------------------SET--------------------------------------
+    void setIsOn(boolean status){
+        this.isOn = status ;
+    }
+    public void setArea(Areas area) {
+        this.area = area.getDisplayName();
+    }
+    private void setHub(Hub hub){
+        this.centralHub = hub ;
+    }
+    // ------------------Actions---------------------------------------
+    public void turnOn() {
+        setIsOn(true);
+    }
+
+    public void turnOff() {
+        setIsOn(false);
+    }
+
+    public boolean isOn(){return this.isOn ;} ;
+
+    public void energySavingMode(){}
+
+    protected void logOperation(String operation) {
+        String timestamp = LocalDateTime.now().format(
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        );
+        System.out.println("[" + timestamp + "] User: Bl0u - " + operation);
     }
 }
